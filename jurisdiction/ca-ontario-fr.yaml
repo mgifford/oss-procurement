@@ -1,0 +1,42 @@
+# Canadian Ontario Guidance (French)
+stages:
+  market: |
+    • Identifiez les options FOSS dans le contexte canadien
+    • Examinez les normes TBS et GC Digital
+    • Évaluez l'accessibilité et les exigences bilingues
+    • [Liste de contrôle Open Source](https://civicactions.github.io/open-practice/?file=Open-Source-Procurement-Checklist.md)
+  planning: |
+    • Définissez un langage d'approvisionnement ouvert
+    • Exigez des licences approuvées par l'OSI
+    • Prévoyez des données ouvertes et la transparence
+    • Astuce : le FOSS est un choix sûr et éprouvé pour le gouvernement.
+  rfp: |
+    • Autorisez les offres FOSS
+    • Exigez le code source et la documentation
+    • Incluez les exigences d'accessibilité et de langue
+    • [FAQ](https://civicactions.github.io/open-practice/?file=OSS-procurement-FAQ.md)
+  evaluation: |
+    • Évaluez le soutien communautaire et des fournisseurs
+    • Examinez les licences et la conformité
+    • Notez la durabilité et l'ouverture
+  award: |
+    • Assurez-vous que le contrat inclut les droits FOSS
+    • Prévoyez le soutien et les mises à jour
+    • Documentez les livrables
+  implementation: |
+    • Utilisez des pratiques de développement ouvertes
+    • Contribuez aux améliorations en amont
+    • Maintenez la documentation
+  maintenance: |
+    • Planifiez des mises à jour régulières
+    • Surveillez les vulnérabilités
+    • Mettez à jour les documents de conformité
+llm_prompts:
+  overview: "Invite : 'Étant donné la description du projet suivante, fournissez un résumé technique de haut niveau des besoins et des exigences.\n\nDescription du projet : {overview}\n\nRésumez les principaux objectifs techniques, les contraintes et toutes les normes ou meilleures pratiques pertinentes à prendre en compte.'"
+  market: "Invite : 'Dressez la liste des solutions open source (FOSS) pour le besoin de projet gouvernemental suivant : {overview}. Incluez les liens, les types de licences et l'activité de la communauté. Excluez les options propriétaires uniquement. Résumez les avantages et les inconvénients de chacune.'"
+  planning: "Invite : 'Rédigez les exigences pour un projet gouvernemental (voir ci-dessous) en utilisant des composants réutilisables et basés sur des normes (voir GovStack et DPI). Assurez-vous que les exigences n'excluent pas le FOSS.\n\nAperçu du projet : {overview}\n\nSuggérez comment structurer les exigences pour permettre à la fois les offres FOSS et propriétaires.'"
+  rfp: "Invite : 'Rédigez une section RFP pour le projet suivant qui encourage les offres FOSS et exige des licences approuvées par l'OSI pour le code personnalisé. Incluez un langage pour éviter l'enfermement du fournisseur et exiger les droits sur le code source pour toutes les livraisons.\n\nAperçu du projet : {overview}'"
+  evaluation: "Invite : 'Créez une matrice d'évaluation pour les offres logicielles pour le projet suivant, en notant les solutions FOSS et propriétaires de manière égale sur la fonctionnalité, le support, la durabilité et l'ouverture. Incluez des critères d'évaluation exemples.\n\nAperçu du projet : {overview}'"
+  award: "Invite : 'Rédigez une clause contractuelle pour garantir que les solutions attribuées (y compris FOSS) pour le projet suivant offrent un support continu, des correctifs et des droits d'utilisation, de modification et de redistribution du code. Incluez les exigences SBOM et de contribution en amont.\n\nAperçu du projet : {overview}'"
+  implementation: "Invite : 'Suggérez les meilleures pratiques pour la mise en œuvre du projet technologique gouvernemental suivant en utilisant des composants réutilisables et des normes ouvertes. Comment les améliorations peuvent-elles être apportées en amont ?\n\nAperçu du projet : {overview}'"
+  maintenance: "Invite : 'Énumérez les étapes pour maintenir les solutions gouvernementales basées sur FOSS pour le projet suivant, y compris les mises à jour régulières, la surveillance des vulnérabilités et la documentation de conformité. Comment assurer la durabilité et éviter l'enfermement du fournisseur ?\n\nAperçu du projet : {overview}'"

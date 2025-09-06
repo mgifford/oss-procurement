@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Open Source Procurement Guide</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f7f7f7;
+      color: #222;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 800px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 32px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+    h1, h2, h3 {
+      color: #2980b9;
+    }
+    label {
+      font-weight: bold;
+      display: block;
+      margin-top: 16px;
+    }
+    select, input, textarea {
+      width: 100%;
+      padding: 8px;
+      margin-top: 4px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+    button {
+      background: #2980b9;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #4aa3ff;
+    }
+    .note {
+      color: #888;
+      font-size: 0.95em;
+      margin-top: 8px;
+    }
+    .output {
+      background: #f4f8fb;
+      border: 1px solid #cce0f5;
+      padding: 16px;
+      border-radius: 4px;
+      margin-top: 24px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Open Source Procurement Guide</h1>
+    <section style="margin-bottom:1.5em;">
+      <h2>Why FOSS? (Free and Open Source Software)</h2>
+      <ul>
+        <li><strong>Cost-effective:</strong> No licensing fees, lower total cost of ownership (<a href="https://civicactions.github.io/open-practice/?file=FOSS-COTS.md" target="_blank">FOSS is COTS</a>).</li>
+        <li><strong>Transparency & Security:</strong> Code can be audited and improved by anyone.</li>
+        <li><strong>Flexibility & Reuse:</strong> Build on proven, reusable components (<a href="https://civicactions.github.io/open-practice/?file=Open-Source-Procurement-Checklist.md" target="_blank">Checklist</a>).</li>
+        <li><strong>Vendor independence:</strong> Avoid lock-in, retain rights to use, modify, and share.</li>
+        <li><strong>Community support:</strong> Leverage global expertise and rapid innovation.</li>
+        <li><strong>Compliant:</strong> Meets government procurement standards (<a href="https://civicactions.github.io/open-practice/?file=OSS-procurement-FAQ.md" target="_blank">FAQ</a>).</li>
+      </ul>
+      <p style="font-size:1.1em;">This guide will walk you through each step, making it easy to do the right thing for your organization and the public. You don’t have to be an expert—just follow along!</p>
+    </section>
+    <p>
+      <strong>All government tech projects are built from reusable components, not snowflakes.</strong> See <a href="https://www.govstack.global/" target="_blank" rel="noopener">GovStack</a> for global best practices on reusable Digital Public Infrastructure (DPI), and <a href="https://en.wikipedia.org/wiki/Digital_public_infrastructure" target="_blank" rel="noopener">Digital Public Infrastructure</a> for more context.<br>
+      <em>Ensure FOSS is considered at every stage, not just proprietary solutions with greater marketing budgets.</em>
+    </p>
+    <form id="procurementForm">
+  <label for="solicitationName">Solicitation/Project Name (optional)</label>
+  <input type="text" id="solicitationName" name="solicitationName" placeholder="e.g. City Website Redesign">
+  <label for="projectOverview">Project Overview</label>
+  <textarea id="projectOverview" name="projectOverview" rows="3" placeholder="Describe the project, goals, or needs in your own words. This will help generate better prompts and guidance."></textarea>
+  <label for="jurisdiction">Jurisdiction</label>
+  <select id="jurisdiction" name="jurisdiction" required>
+        <option value="">-- Select --</option>
+        <option value="us">United States</option>
+        <option value="ca">Canada</option>
+        <option value="nl">Netherlands</option>
+        <option value="eu">European Union</option>
+        <option value="other">Other</option>
+      </select>
+  <label for="stage">Procurement Stage</label>
+  <select id="stage" name="stage" required>
+        <option value="">-- Select --</option>
+        <option value="market">Market Research</option>
+        <option value="planning">Planning & Requirements</option>
+        <option value="rfp">RFP/Tender</option>
+        <option value="evaluation">Evaluation</option>
+        <option value="award">Award & Contracting</option>
+        <option value="implementation">Implementation</option>
+        <option value="maintenance">Maintenance</option>
+      </select>
+  <label for="ambition">Digital Ambition Level</label>
+  <select id="ambition" name="ambition" required>
+        <option value="">-- Select --</option>
+        <option value="basic">Basic</option>
+        <option value="intermediate">Intermediate</option>
+        <option value="advanced" selected>Advanced</option>
+      </select>
+  <button type="submit">Show Guidance</button>
+  <button type="button" id="prevBtn" style="margin-left:12px; display:none;">Previous</button>
+  <button type="button" id="nextBtn" style="margin-left:12px; display:none;">Next</button>
+  <button type="button" id="saveBtn" style="margin-left:12px;">Save Progress</button>
+   <input type="file" id="loadFileInput" accept=".yaml,.yml" style="display:none;" />
+   <button type="button" id="loadBtn" style="margin-left:12px;">Load Progress</button>
+    </form>
+  <div class="output" id="projectOverviewDisplay" style="display:none;"></div>
+  <div class="output" id="output"></div>
+  <div class="output" id="checklistOutput" style="display:none;"></div>
+    <div class="output" id="llmPromptOutput" style="display:none;"></div>
+    <div class="note">No data is stored or sent. All processing is local in your browser.</div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/js-yaml@4.1.0/dist/js-yaml.min.js"></script>
+  <script>
+    // Helper: get/set URL params
+    function setUrlParams(jurisdiction, stage, overview, solicitationName, ambition) {
+      const params = new URLSearchParams(window.location.search);
+      if (jurisdiction) params.set('jurisdiction', jurisdiction); else params.delete('jurisdiction');
+      if (stage) params.set('stage', stage); else params.delete('stage');
+      if (overview) params.set('projectOverview', encodeURIComponent(overview)); else params.delete('projectOverview');
+      if (solicitationName) params.set('solicitationName', encodeURIComponent(solicitationName)); else params.delete('solicitationName');
+      if (ambition) params.set('ambition', ambition); else params.delete('ambition');
+      const newUrl = window.location.pathname + '?' + params.toString();
+      window.history.replaceState({}, '', newUrl);
+    }
+    function getUrlParam(name) {
+      return new URLSearchParams(window.location.search).get(name);
+    }
+
+    // On load, set form from URL params if present
+    window.addEventListener('DOMContentLoaded', function() {
+      const jurisdiction = getUrlParam('jurisdiction');
+      let stage = getUrlParam('stage');
+      const overview = getUrlParam('projectOverview');
+      const solicitationName = getUrlParam('solicitationName');
+      if (jurisdiction) document.getElementById('jurisdiction').value = jurisdiction;
+      // Enforce stage is in stages array, else default to first
+      const stagesArr = [
+        'market',
+        'planning',
+        'rfp',
+        'evaluation',
+        'award',
+        'implementation',
+        'maintenance'
+      ];
+      if (!stage || stagesArr.indexOf(stage) === -1) stage = stagesArr[0];
+      document.getElementById('stage').value = stage;
+      if (overview) document.getElementById('projectOverview').value = decodeURIComponent(overview);
+      if (solicitationName) document.getElementById('solicitationName').value = decodeURIComponent(solicitationName);
+      // Show project overview if present
+      if (overview) {
+        document.getElementById('projectOverviewDisplay').style.display = 'block';
+        document.getElementById('projectOverviewDisplay').innerHTML = '<strong>Project Overview:</strong><br>' + decodeURIComponent(overview);
+      }
+    });
+    // Dynamically loaded guidance and prompts
+    let loadedGuidance = null;
+    let loadedPrompts = null;
+
+    // Helper: Map jurisdiction/language to YAML file
+    function getYamlFile(jurisdiction, language = 'en') {
+      // Add more mappings as needed
+  if (jurisdiction === 'us') return 'jurisdiction/us-national.yaml';
+  if (jurisdiction === 'ca' && language === 'fr') return 'jurisdiction/ca-ontario-fr.yaml';
+  if (jurisdiction === 'ca') return 'jurisdiction/ca-national-en.yaml';
+  if (jurisdiction === 'be' && language === 'fr') return 'jurisdiction/be-national-fr.yaml';
+      // Default fallback
+      return null;
+    }
+
+    // Load YAML file and parse
+    async function loadGuidanceYaml(jurisdiction, language = 'en') {
+      const file = getYamlFile(jurisdiction, language);
+      if (!file) return null;
+      try {
+        const resp = await fetch(file);
+        if (!resp.ok) throw new Error('Not found');
+        const text = await resp.text();
+        const data = jsyaml.load(text);
+        loadedGuidance = data.stages || {};
+        loadedPrompts = data.llm_prompts || {};
+        return true;
+      } catch (e) {
+        loadedGuidance = null;
+        loadedPrompts = null;
+        return false;
+      }
+    }
+    // List of stages for navigation
+    const stages = [
+      'market',
+      'planning',
+      'rfp',
+      'evaluation',
+      'award',
+      'implementation',
+      'maintenance'
+    ];
+
+    function updateNavButtons() {
+      const stage = document.getElementById('stage').value;
+      const prevBtn = document.getElementById('prevBtn');
+      const nextBtn = document.getElementById('nextBtn');
+      const idx = stages.indexOf(stage);
+      // Hide Previous on first, Next on last, show otherwise
+      prevBtn.style.display = (idx <= 0) ? 'none' : '';
+      nextBtn.style.display = (idx === -1 || idx >= stages.length - 1) ? 'none' : '';
+    }
+
+    async function showGuidanceAndPrompt() {
+      const jurisdiction = document.getElementById('jurisdiction').value;
+      const stage = document.getElementById('stage').value;
+      const overview = document.getElementById('projectOverview').value.trim();
+      const solicitationName = document.getElementById('solicitationName').value.trim();
+      const ambition = document.getElementById('ambition').value;
+      setUrlParams(jurisdiction, stage, overview, solicitationName, ambition);
+      let output = '';
+      await loadGuidanceYaml(jurisdiction);
+      if (loadedGuidance && loadedGuidance[stage]) {
+        output = loadedGuidance[stage];
+      } else {
+        output = 'Please select both a jurisdiction and a procurement stage.';
+      }
+      document.getElementById('output').innerHTML = output;
+      // Show project overview as context
+      if (overview) {
+        document.getElementById('projectOverviewDisplay').style.display = 'block';
+        document.getElementById('projectOverviewDisplay').innerHTML = '<strong>Project Overview:</strong><br>' + overview;
+      } else {
+        document.getElementById('projectOverviewDisplay').style.display = 'none';
+      }
+      // Show LLM prompt automatically
+      let prompt = '';
+      if (loadedPrompts && loadedPrompts[stage]) {
+        prompt = loadedPrompts[stage].replace('{overview}', overview || '[describe your need]');
+      } else if (loadedPrompts && loadedPrompts.overview && overview) {
+        prompt = loadedPrompts.overview.replace('{overview}', overview);
+      }
+      const out = document.getElementById('llmPromptOutput');
+      out.textContent = prompt;
+      out.style.display = 'block';
+      updateNavButtons();
+    }
+    // Dynamically update URL as form fields change
+    function updateUrlFromForm() {
+      const jurisdiction = document.getElementById('jurisdiction').value;
+      const stage = document.getElementById('stage').value;
+      const overview = document.getElementById('projectOverview').value.trim();
+      const solicitationName = document.getElementById('solicitationName').value.trim();
+      const ambition = document.getElementById('ambition').value;
+      setUrlParams(jurisdiction, stage, overview, solicitationName, ambition);
+    }
+
+    document.getElementById('jurisdiction').addEventListener('change', updateUrlFromForm);
+    document.getElementById('stage').addEventListener('change', updateUrlFromForm);
+    document.getElementById('projectOverview').addEventListener('input', updateUrlFromForm);
+    document.getElementById('solicitationName').addEventListener('input', updateUrlFromForm);
+    document.getElementById('ambition').addEventListener('change', updateUrlFromForm);
+
+    document.getElementById('procurementForm').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      await showGuidanceAndPrompt();
+    });
+
+    document.getElementById('prevBtn').addEventListener('click', function() {
+      let stage = document.getElementById('stage').value;
+      let idx = stages.indexOf(stage);
+      if (idx > 0) {
+        stage = stages[idx - 1];
+        document.getElementById('stage').value = stage;
+        updateUrlFromForm();
+        showGuidanceAndPrompt();
+      }
+    });
+    document.getElementById('nextBtn').addEventListener('click', function() {
+      let stage = document.getElementById('stage').value;
+      let idx = stages.indexOf(stage);
+      if (idx !== -1 && idx < stages.length - 1) {
+        stage = stages[idx + 1];
+        document.getElementById('stage').value = stage;
+        updateUrlFromForm();
+        showGuidanceAndPrompt();
+      }
+    });
+
+    // Update nav buttons on stage change
+    document.getElementById('stage').addEventListener('change', updateNavButtons);
+    // Also update on load
+    window.addEventListener('DOMContentLoaded', updateNavButtons);
+
+  // (Removed Sample LLM Prompt button logic; prompt now shown automatically)
+
+    // Save Progress: Download YAML file
+    document.getElementById('saveBtn').addEventListener('click', function() {
+      const jurisdiction = document.getElementById('jurisdiction').value;
+      const stage = document.getElementById('stage').value;
+      const overview = document.getElementById('projectOverview').value.trim();
+      const ambition = document.getElementById('ambition').value;
+      let solicitationName = document.getElementById('solicitationName').value.trim();
+      if (!solicitationName) solicitationName = 'untitled';
+      const now = new Date();
+      const dateStr = now.toISOString().slice(0,10);
+      const yaml =
+        `date: "${dateStr}"
+solicitation: "${solicitationName.replace(/"/g, '\"')}"
+jurisdiction: "${jurisdiction}"
+stage: "${stage}"
+ambition: "${ambition}"
+overview: "${overview.replace(/"/g, '\"')}"
+`;
+      const blob = new Blob([yaml], {type: 'text/yaml'});
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `oss-procurement-${dateStr}-${solicitationName.replace(/\s+/g,'_')}.yaml`;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(()=>{
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+    });
+
+    // Load Progress: Upload YAML file and populate form
+    document.getElementById('loadBtn').addEventListener('click', function() {
+      document.getElementById('loadFileInput').click();
+    });
+    document.getElementById('loadFileInput').addEventListener('change', function(e) {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = function(evt) {
+        try {
+          const data = jsyaml.load(evt.target.result);
+          if (data) {
+            if (data.jurisdiction) document.getElementById('jurisdiction').value = data.jurisdiction;
+            if (data.stage) document.getElementById('stage').value = data.stage;
+            if (data.overview) document.getElementById('projectOverview').value = data.overview;
+            if (data.solicitation) document.getElementById('solicitationName').value = data.solicitation;
+            if (data.ambition) document.getElementById('ambition').value = data.ambition;
+            document.getElementById('procurementForm').dispatchEvent(new Event('submit'));
+          }
+        } catch (err) {
+          alert('Failed to load YAML: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      // Reset file input so same file can be loaded again if needed
+      e.target.value = '';
+    });
+
+  // (Removed duplicate/old Next button handler)
+    function yamlEscape(str) {
+  if (!str) return '';
+  return str.replace(/"/g, '\"').replace(/\n/g, '\\n');
+}
+// Download YAML button
+window.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('downloadBtn').addEventListener('click', function() {
+    const jurisdiction = document.getElementById('jurisdiction').value;
+    const stage = document.getElementById('stage').value;
+    const overview = document.getElementById('projectOverview').value.trim();
+    const ambition = document.getElementById('ambition').value;
+    let solicitationName = document.getElementById('solicitationName').value.trim();
+    if (!solicitationName) solicitationName = 'untitled';
+    const now = new Date();
+    const dateStr = now.toISOString().slice(0,10);
+    const yaml =
+      `date: "${dateStr}"
+solicitation: "${yamlEscape(solicitationName)}"
+jurisdiction: "${yamlEscape(jurisdiction)}"
+stage: "${yamlEscape(stage)}"
+ambition: "${yamlEscape(ambition)}"
+overview: "${yamlEscape(overview)}"
+`;
+    const blob = new Blob([yaml], {type: 'text/yaml'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `oss-procurement-${dateStr}-${solicitationName.replace(/\s+/g,'_')}.yaml`;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(()=>{
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }, 100);
+  });
+  // Back button: go to previous stage
+  document.getElementById('backBtn').addEventListener('click', function() {
+    const stages = [
+      'market',
+      'planning',
+      'rfp',
+      'evaluation',
+      'award',
+      'implementation',
+      'maintenance'
+    ];
+    const current = document.getElementById('stage').value;
+    let idx = stages.indexOf(current);
+    if (idx <= 0) idx = stages.length-1; else idx--;
+    document.getElementById('stage').value = stages[idx];
+    document.getElementById('procurementForm').dispatchEvent(new Event('submit'));
+  });
+});
+  </script>
+</body>
+</html>

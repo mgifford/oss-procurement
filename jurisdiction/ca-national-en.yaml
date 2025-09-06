@@ -1,0 +1,42 @@
+# Canadian National Guidance (English)
+stages:
+  market: |
+    • Identify FOSS options in the Canadian context
+    • Review TBS and GC Digital Standards
+    • Assess accessibility and bilingual requirements
+    • [Open Source Checklist](https://civicactions.github.io/open-practice/?file=Open-Source-Procurement-Checklist.md)
+  planning: |
+    • Define open procurement language
+    • Require OSI-approved licenses
+    • Plan for open data and transparency
+    • Tip: FOSS is a safe, proven choice for government.
+  rfp: |
+    • Allow FOSS bids
+    • Require source code and documentation
+    • Include accessibility and language requirements
+    • [FAQ](https://civicactions.github.io/open-practice/?file=OSS-procurement-FAQ.md)
+  evaluation: |
+    • Assess community and vendor support
+    • Review licensing and compliance
+    • Score on sustainability and openness
+  award: |
+    • Ensure contract includes FOSS rights
+    • Plan for support and updates
+    • Document deliverables
+  implementation: |
+    • Use open development practices
+    • Contribute improvements upstream
+    • Maintain documentation
+  maintenance: |
+    • Schedule regular updates
+    • Monitor for vulnerabilities
+    • Update compliance docs
+llm_prompts:
+  overview: "Prompt: 'Given the following project description, provide a high-level technical summary of the needs and requirements.\n\nProject Description: {overview}\n\nSummarize the main technical goals, constraints, and any relevant standards or best practices that should be considered.'"
+  market: "Prompt: 'List open source (FOSS) solutions for the following government project need: {overview}. Include links, license types, and community activity. Exclude proprietary-only options. Summarize pros and cons for each.'"
+  planning: "Prompt: 'Draft requirements for a government project (see below) using reusable, standards-based components (see GovStack and DPI). Ensure requirements do not exclude FOSS.\n\nProject Overview: {overview}\n\nSuggest how to structure requirements to allow both FOSS and proprietary bids.'"
+  rfp: "Prompt: 'Write an RFP section for the following project that encourages FOSS bids and requires OSI-approved licenses for custom code. Include language to prevent vendor lock-in and require source code rights for all deliverables.\n\nProject Overview: {overview}'"
+  evaluation: "Prompt: 'Create an evaluation matrix for software bids for the following project, scoring FOSS and proprietary solutions equally on functionality, support, sustainability, and openness. Include sample scoring criteria.\n\nProject Overview: {overview}'"
+  award: "Prompt: 'Draft contract language to ensure awarded solutions (including FOSS) for the following project provide ongoing support, patching, and rights to use, modify, and redistribute code. Include SBOM and upstream contribution requirements.\n\nProject Overview: {overview}'"
+  implementation: "Prompt: 'Suggest best practices for implementing the following government tech project using reusable components and open standards. How can improvements be contributed upstream?\n\nProject Overview: {overview}'"
+  maintenance: "Prompt: 'List steps for maintaining FOSS-based government solutions for the following project, including regular updates, vulnerability monitoring, and compliance documentation. How to ensure sustainability and avoid vendor lock-in?\n\nProject Overview: {overview}'"
